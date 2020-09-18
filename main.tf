@@ -29,12 +29,4 @@ variable "account" {
 
 variable "region" {
   default = "eu-west-1"
-}
-# Global Variables
-variable "account_id" {
-  default = "403255647730"
-}
 
-variable "assume_role" {
-  default = "SRE"
-}
