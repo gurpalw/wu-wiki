@@ -17,43 +17,43 @@ resource "aws_autoscaling_group" "nat_asg_0" {
   }
 }
 
-resource "aws_autoscaling_group" "nat_asg_1" {
-  name                = "nat-1"
-  vpc_zone_identifier = [module.vpc.public_subnets[1]]
-  desired_capacity    = 1
-  max_size            = 1
-  min_size            = 1
-
-  launch_template {
-    id      = aws_launch_template.nat_launch_template.id
-    version = "$Latest"
-  }
-
-  tag {
-    key                 = "Name"
-    value               = "nat-1"
-    propagate_at_launch = true
-  }
-}
-
-resource "aws_autoscaling_group" "nat_asg_2" {
-  name                = "nat-2"
-  vpc_zone_identifier = [module.vpc.public_subnets[2]]
-  desired_capacity    = 1
-  max_size            = 1
-  min_size            = 1
-
-  launch_template {
-    id      = aws_launch_template.nat_launch_template.id
-    version = "$Latest"
-  }
-
-  tag {
-    key                 = "Name"
-    value               = "nat-2"
-    propagate_at_launch = true
-  }
-}
+//resource "aws_autoscaling_group" "nat_asg_1" {
+//  name                = "nat-1"
+//  vpc_zone_identifier = [module.vpc.public_subnets[1]]
+//  desired_capacity    = 1
+//  max_size            = 1
+//  min_size            = 1
+//
+//  launch_template {
+//    id      = aws_launch_template.nat_launch_template.id
+//    version = "$Latest"
+//  }
+//
+//  tag {
+//    key                 = "Name"
+//    value               = "nat-1"
+//    propagate_at_launch = true
+//  }
+//}
+//
+//resource "aws_autoscaling_group" "nat_asg_2" {
+//  name                = "nat-2"
+//  vpc_zone_identifier = [module.vpc.public_subnets[2]]
+//  desired_capacity    = 1
+//  max_size            = 1
+//  min_size            = 1
+//
+//  launch_template {
+//    id      = aws_launch_template.nat_launch_template.id
+//    version = "$Latest"
+//  }
+//
+//  tag {
+//    key                 = "Name"
+//    value               = "nat-2"
+//    propagate_at_launch = true
+//  }
+//}
 
 resource "aws_launch_template" "nat_launch_template" {
   name_prefix            = "nat"
@@ -70,12 +70,11 @@ resource "aws_launch_template" "nat_launch_template" {
 }
 
 data "template_file" "nat_userdata" {
-  template = "file(nat-userdata.sh)"
-
+  template = file("nat-userdata.sh")
 }
 
 resource "aws_eip" "nat-elastic-ips" {
-  count = 3
+  count = 1
 
   tags = {
     Name = "nat-${count.index}"
