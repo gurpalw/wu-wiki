@@ -60,7 +60,7 @@ resource "aws_security_group" "bastion" {
     from_port   = 8
     to_port     = 0
     protocol    = "icmp"
-    cidr_blocks = ["82.39.154.82/32"]
+    cidr_blocks = ["82.39.354.82/32"]
   }
 
   egress {
