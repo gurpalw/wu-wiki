@@ -1,6 +1,7 @@
-resource "aws_autoscaling_group" "nat_asg_0" {
-  name                = "nat-0"
-  vpc_zone_identifier = [module.vpc.public_subnets[0]]
+resource "aws_autoscaling_group" "nat_asg" {
+  count               = 3
+  name                = "nat-${count.index}"
+  vpc_zone_identifier = [module.vpc.public_subnets[count.index]]
   desired_capacity    = 1
   max_size            = 1
   min_size            = 1
@@ -12,48 +13,10 @@ resource "aws_autoscaling_group" "nat_asg_0" {
 
   tag {
     key                 = "Name"
-    value               = "nat-0"
+    value               = "nat-${count.index}"
     propagate_at_launch = true
   }
 }
-
-//resource "aws_autoscaling_group" "nat_asg_1" {
-//  name                = "nat-1"
-//  vpc_zone_identifier = [module.vpc.public_subnets[1]]
-//  desired_capacity    = 1
-//  max_size            = 1
-//  min_size            = 1
-//
-//  launch_template {
-//    id      = aws_launch_template.nat_launch_template.id
-//    version = "$Latest"
-//  }
-//
-//  tag {
-//    key                 = "Name"
-//    value               = "nat-1"
-//    propagate_at_launch = true
-//  }
-//}
-//
-//resource "aws_autoscaling_group" "nat_asg_2" {
-//  name                = "nat-2"
-//  vpc_zone_identifier = [module.vpc.public_subnets[2]]
-//  desired_capacity    = 1
-//  max_size            = 1
-//  min_size            = 1
-//
-//  launch_template {
-//    id      = aws_launch_template.nat_launch_template.id
-//    version = "$Latest"
-//  }
-//
-//  tag {
-//    key                 = "Name"
-//    value               = "nat-2"
-//    propagate_at_launch = true
-//  }
-//}
 
 resource "aws_launch_template" "nat_launch_template" {
   name_prefix            = "nat"
@@ -74,7 +37,7 @@ data "template_file" "nat_userdata" {
 }
 
 resource "aws_eip" "nat-elastic-ips" {
-  count = 1
+  count = 3
 
   tags = {
     Name = "nat-${count.index}"
@@ -87,37 +50,23 @@ resource "aws_security_group" "nat" {
   vpc_id      = module.vpc.vpc_id
 
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    from_port   = 0
+    protocol    = "-1"
+    to_port     = 0
     cidr_blocks = module.vpc.private_subnets_cidr_blocks
   }
 
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["82.39.154.82/32"]
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = module.vpc.private_subnets_cidr_blocks
+    from_port   = 0
+    protocol    = "-1"
+    to_port     = 0
+    cidr_blocks = module.vpc.public_subnets_cidr_blocks
   }
 
   egress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+    from_port   = 0
+    protocol    = "-1"
+    to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
   }
 
